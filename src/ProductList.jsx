@@ -1,9 +1,22 @@
 import React, { useState,useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
-function ProductList() {
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem } from './CartSlice';
+function ProductList(props) {
     const [showCart, setShowCart] = useState(false); 
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState({});
+    const dispatch = useDispatch();
+    const cartItems=useSelector(state => state.cart.items);
+    console.log(cartItems);
+    // setCart(cartItems);
+    useEffect(() => {
+        
+    }, []);
+    const alreadyInCart = (itemName) => {
+        return cartItems.some((item) => item.name === itemName);
+    }
 
     const plantsArray = [
         {
@@ -242,6 +255,14 @@ const handlePlantsClick = (e) => {
     setShowCart(false); // Hide the cart when navigating to About Us
 };
 
+const handleAddToCart = (product) => {
+    dispatch(addItem(product));
+    setAddedToCart((prevState) => ({
+       ...prevState,
+       [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
+     }));
+  };
+
    const handleContinueShopping = (e) => {
     e.preventDefault();
     setShowCart(false);
@@ -267,7 +288,20 @@ const handlePlantsClick = (e) => {
             </div>
         </div>
         {!showCart? (
-        <div className="product-grid">
+            <div className="product-grid">
+            <br></br>
+            {plantsArray.map((item)=><div className='mainCategoryDiv'> <h1>{item.category}</h1> 
+            <div className="product-list">
+            {item.plants.map((plant)=>
+                <div className='product-card'>
+                    <img className='product-image' src={plant.image} alt={plant.name} />
+                    <h2>{plant.name}</h2>
+                    <p>{plant.description}</p>
+                    <p>{plant.cost}</p>
+                    <button style={{backgroundColor:alreadyInCart(plant.name)?"gray":"#615EFC"}} disabled={alreadyInCart(plant.name)? true:false} onClick={()=>handleAddToCart({name:plant.name,cost:plant.cost,image:plant.image})} className='product-button'>Add to Cart</button>
+                </div>)}
+                 </div>
+            </div>)}
 
 
         </div>
